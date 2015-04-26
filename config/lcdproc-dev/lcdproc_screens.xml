@@ -27,7 +27,7 @@
 			<fielddescr>Enable Version</fielddescr>
 			<fieldname>scr_version</fieldname>
 			<type>checkbox</type>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>Enable Time</fielddescr>
 			<fieldname>scr_time</fieldname>
@@ -87,15 +87,20 @@
 			<fielddescr>Enable Mbuf</fielddescr>
 			<fieldname>scr_mbuf</fieldname>
 			<type>checkbox</type>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>Enable CPU Frequency</fielddescr>
 			<fieldname>scr_cpufrequency</fieldname>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Enable List of Interfaces by Traffic</fielddescr>
-			<fieldname>scr_traffic_interface_list</fieldname>
+			<fielddescr>Enable Top Interfaces&lt;br/&gt;(ordered by bits-per-second)</fielddescr>
+			<fieldname>scr_top_interfaces_by_bps</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable Top Interfaces&lt;br/&gt;(ordered by bytes today)</fielddescr>
+			<fieldname>scr_top_interfaces_by_bytes_today</fieldname>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -107,8 +112,8 @@
 			<fielddescr> > interface selected</fielddescr>
 			<fieldname>scr_traffic_interface</fieldname>
 			<type>interfaces_selection</type>
-			<description>If Interface Traffic is enabled, here you specify which interface to monitor</description>
-		</field>				
+			<description>If Single-interface Traffic is enabled, here you specify which interface to monitor</description>
+		</field>
 	</fields>
 	<custom_php_command_before_form>
 		before_form_lcdproc_screens($pkg);

@@ -1,41 +1,41 @@
 <?php
 /* $Id$ */
 /*
-        lcdproc_client.php
-        Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
-        Copyright (C) 2012 Michele Di Maria <michele@nt2.it>
-        All rights reserved.
+		lcdproc_client.php
+		Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
+		Copyright (C) 2012 Michele Di Maria <michele@nt2.it>
+		All rights reserved.
 
-        Redistribution and use in source and binary forms, with or without
-        modification, are permitted provided that the following conditions are met:
+		Redistribution and use in source and binary forms, with or without
+		modification, are permitted provided that the following conditions are met:
 
-        1. Redistributions of source code must retain the above copyright notice,
-           this list of conditions and the following disclaimer.
+		1. Redistributions of source code must retain the above copyright notice,
+		   this list of conditions and the following disclaimer.
 
-        2. Redistributions in binary form must reproduce the above copyright
-           notice, this list of conditions and the following disclaimer in the
-           documentation and/or other materials provided with the distribution.
+		2. Redistributions in binary form must reproduce the above copyright
+		   notice, this list of conditions and the following disclaimer in the
+		   documentation and/or other materials provided with the distribution.
 
-        THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-        INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-        AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-        AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-        OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-        SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-        INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-        CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-        ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-        POSSIBILITY OF SUCH DAMAGE.
+		THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+		INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+		AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+		OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+		SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+		INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+		CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+		ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		POSSIBILITY OF SUCH DAMAGE.
 */
-	
+
 	/*   trick interface into running this.  we are only
-	 *   calling from useland so this is not a security issue 
+	 *   calling from useland so this is not a security issue
 	 */
 	require_once("config.inc");
 	require_once("functions.inc");
 	require_once("interfaces.inc");
 	require_once("/usr/local/pkg/lcdproc.inc");
-	
+
 	function get_pfstate() {
 		global $config;
 		$matches = "";
@@ -43,14 +43,14 @@
 			$maxstates="/{$config['system']['maximumstates']}";
 		else
 			$maxstates="/". pfsense_default_state_size();
-			
+
 		$curentries = `/sbin/pfctl -si |grep current`;
 		if (preg_match("/([0-9]+)/", $curentries, $matches)) {
 			$curentries = $matches[1];
 		}
 		return $curentries . $maxstates;
 	}
-		
+
 	function disk_usage() {
 		$dfout = "";
 		exec("/bin/df -h | /usr/bin/grep -w '/' | /usr/bin/awk '{ print $5 }' | /usr/bin/cut -d '%' -f 1", $dfout);
@@ -105,7 +105,7 @@
 			$status = "$temp[0] ";
 		}
 		$status = trim(str_replace("  ", " ", $status));
-		$status = substr($status, strpos($status, "up ") + 3);		
+		$status = substr($status, strpos($status, "up ") + 3);
 		return($status);
 	}
 
@@ -120,21 +120,21 @@
 		}
 		return($status);
 	}
-	
-	function get_mbuf_stats() {	
+
+	function get_mbuf_stats() {
 		exec("netstat -mb | grep \"mbufs in use\" | awk '{ print $1 }' | cut -d\"/\" -f1", $mbufs_inuse);
 		exec("netstat -mb | grep \"mbufs in use\" | awk '{ print $1 }' | cut -d\"/\" -f3", $mbufs_total);
 		$status = "$mbufs_inuse[0] \/ $mbufs_total[0]";
 		return($status);
 	}
-	
+
 	function get_version() {
 		global $g;
 		$version = @file_get_contents("/etc/version");
 		$version = trim($version);
 		return("{$g['product_name']} {$version}");
-	}	
-	
+	}
+
 	function get_cpufrequency(){
 		$cpufreqs = "";
 		exec("/sbin/sysctl -n dev.cpu.0.freq_levels", $cpufreqs);
@@ -147,7 +147,7 @@
 		$status = "$curfreq\/$maxfreq Mhz";
 		return($status);
 	}
-	
+
 	function get_cpufrequency_perc(){
 		$cpufreqs = "";
 		exec("/sbin/sysctl -n dev.cpu.0.freq_levels", $cpufreqs);
@@ -159,7 +159,7 @@
 		$curfreq = trim($curfreq[0]);
 		$status = $curfreq/$maxfreq * 100;
 		return($status);
-	}	
+	}
 
 	function get_interfaces_stats() {
 		global $g;
@@ -201,7 +201,7 @@
 
 		$nentries = $config['syslog']['nentries'];
 		if (!$nentries)
-		        $nentries = 50;
+			$nentries = 50;
 
 		$now = time();
 		$year = date("Y");
@@ -218,7 +218,7 @@
 				}
 				foreach ((array) $vipent['servers'] as $server) {
 					$lastchange = "";
-                                        $svr = split("\|", $server);
+					$svr = split("\|", $server);
 					$monitorip = $svr[1];
 					if(stristr($poolstatus, $monitorip)) {
 						$online = "Up";
@@ -243,7 +243,7 @@
 		global $config;
 
 		if(is_array($config['virtualip']['vip'])) {
-		  	$carpint = 0;
+			  $carpint = 0;
 			$initcount = 0;
 			$mastercount = 0;
 			$backupcount = 0;
@@ -280,9 +280,9 @@
 	function get_ipsec_tunnel_sad() {
 		/* query SAD */
 		if(file_exists("/usr/local/sbin/setkey"))
-			$fd = @popen("/usr/local/sbin/setkey -D", "r"); 
+			$fd = @popen("/usr/local/sbin/setkey -D", "r");
 		else
-			$fd = @popen("/sbin/setkey -D", "r"); 
+			$fd = @popen("/sbin/setkey -D", "r");
 		$sad = array();
 		if ($fd) {
 			while (!feof($fd)) {
@@ -340,12 +340,12 @@
 			return(false);
 		}
 		foreach($sad as $sa) {
-			if($sa['src'] == $interfaceip) 
+			if($sa['src'] == $interfaceip)
 				$foundsrc = true;
-			if($sa['dst'] == $tunnel['remote-gateway']) 
+			if($sa['dst'] == $tunnel['remote-gateway'])
 				$founddst = true;
 		}
-		if($foundsrc && $founddst) { 
+		if($foundsrc && $founddst) {
 			/* tunnel is up */
 			$iconfn = "pass";
 			return(true);
@@ -365,18 +365,18 @@
 		$inactivecounter = 0;
 
 		if($config['ipsec']['tunnel']) {
-			foreach ($config['ipsec']['tunnel'] as $tunnel){ 
+			foreach ($config['ipsec']['tunnel'] as $tunnel){
 				$ipsecstatus = false;
 
 				$tun_disabled = "false";
 				$foundsrc = false;
-				$founddst = false; 
-	
+				$founddst = false;
+
 				if (isset($tunnel['disabled'])) {
 					$tun_disabled = "true";
 					continue;
-				}		
-			
+				}
+
 				if(output_ipsec_tunnel_status($tunnel)) {
 					/* tunnel is up */
 					$iconfn = "true";
@@ -385,7 +385,7 @@
 					/* tunnel is down */
 					$iconfn = "false";
 					$inactivecounter++;
-				}			
+				}
 			}
 		}
 
@@ -397,7 +397,7 @@
 		return($status);
 	}
 
-	
+
 	/* Define functions */
 	function send_lcd_commands($lcd, $lcd_cmds) {
 		if(!is_array($lcd_cmds) || (empty($lcd_cmds))) {
@@ -431,7 +431,7 @@
 			return $dimensions[0];
 		}
 	}
-	
+
 	function get_lcdpanel_height(){
 		global $config;
 		$lcdproc_size_config = $config['installedpackages']['lcdproc']['config'][0];
@@ -443,29 +443,29 @@
 			$dimensions = split("x", $lcdproc_size_config['size']);
 			return $dimensions[1];
 		}
-	}	
-	
+	}
+
 	function get_lcdpanel_refresh_frequency(){
 		global $config;
 		$lcdproc_size_config = $config['installedpackages']['lcdproc']['config'][0];
 		$value = $lcdproc_size_config['refresh_frequency'];
 		if (is_null($value)) {
 			return "5";
-		}	
+		}
 		else
 		{
 			return $value;
 		}
 	}
-	
+
 	function outputled_enabled_CFontz633(){
 		global $config;
 		$lcdproc_config = $config['installedpackages']['lcdproc']['config'][0];
 		$value = $lcdproc_config['outputleds'];
-		if (is_null($value)) 
-			{return false;}	
+		if (is_null($value))
+			{return false;}
 		else
-		{			
+		{
 			if ($value && $lcdproc_config['driver'] == "CFontz633")
 				{return true;}
 			else if ($value && $lcdproc_config['driver'] == "CFontzPacket")
@@ -474,21 +474,21 @@
 				{return false;}
 		}
 	}
-	
+
 	function outputled_carp () {
-		/* Returns the status of CARP for the box. 
+		/* Returns the status of CARP for the box.
 		Assumes ALL CARP status are the same for all the intefaces.
 			-1 = CARP Disabled
-			0  = CARP on Backup 
+			0  = CARP on Backup
 			1  = CARP on Master */
 		global $g;
 		global $config;
 
 		if(is_array($config['virtualip']['vip'])) {
-		  	$carpint = 0;
+			$carpint = 0;
 			foreach($config['virtualip']['vip'] as $carp) {
 				if ($carp['mode'] != "carp") {
-					 continue;
+					continue;
 				}
 				$carp_int = find_carp_interface($carp['subnet']);
 				$status = get_carp_interface_status($carp_int);
@@ -500,14 +500,14 @@
 						return 0;
 						break;
 				}
-			}			
+			}
 		} else {
 			return -1;
-		}		
-	}	
-	
+		}
+	}
+
 	function outputled_gateway() {
-		/* Returns the status of the gateways. 
+		/* Returns the status of the gateways.
 			-1 = No gateway defined
 			0  = At least 1 gateway down or with issues
 			1  = All gateway up  */
@@ -525,30 +525,43 @@
 		}
 		return 1;
 	}
-	
 
-	function get_interface_traffic_list() {
-		/* Returns a sorted list of all the interfaces along with their in/out traffic,
-			sorted by total traffic */
+	function get_interface_traffic_stats_list() {
+		/* Returns a dictionary of all the interfaces along with their in/out traffic,
+		   keyed on the interface name */
 		global $config;
 
 		$result = array();
 
 		foreach($config['interfaces'] as $interface) {
+			// get the interface stats (code from ifstats.php)
+			$interfaceName = $interface['if'];
+			$interfaceStats = pfSense_get_interface_stats($interfaceName);
 
-			get_bytesPerSecond_of_interface($interface['if'], $in_bps, $out_bps);
+			get_bytesPerSecond_of_interface($interfaceName, $interfaceStats, $in_bps, $out_bps);
 
 			$entry = array();
-			$entry['descr']		 = $interface['descr'];
-			$entry['in_bps']		= $in_bps;
-			$entry['out_bps']	 = $out_bps;
-			$entry['total_bps'] = $in_bps + $out_bps;
+			$entry['descr']       = $interface['descr'];
+
+			$entry['in_bps']      = $in_bps;
+			$entry['out_bps']     = $out_bps;
+			$entry['total_bps']   = $in_bps + $out_bps;
+
+			$entry['in_bytes']    = $interfaceStats['inbytes'];
+			$entry['out_bytes']   = $interfaceStats['outbytes'];
+			$entry['total_bytes'] = $interfaceStats['inbytes'] + $interfaceStats['outbytes'];
 
 			$result[$interface['if']] = $entry;
 		}
-		uasort($result, "cmp_total_bps");
-
 		return $result;
+	}
+
+	function sort_interface_list_by_bytesToday($interfaceTrafficStatsList) {
+		uasort($interfaceTrafficStatsList, "cmp_total_bytes");
+	}
+
+	function sort_interface_list_by_bps($interfaceTrafficStatsList) {
+		uasort($interfaceTrafficStatsList, "cmp_total_bps");
 	}
 
 	function cmp_total_bps($a, $b)
@@ -559,39 +572,59 @@
 			return ($a['total_bps'] < $b['total_bps']) ? 1 : -1;
 	}
 
-	function get_bytesPerSecond_of_interface($realif, &$in_data_bps, &$out_data_bps){
+	function cmp_total_bytes($a, $b)
+	{
+			if ($a['total_bytes'] == $b['total_bytes']) {
+					return 0;
+			}
+			return ($a['total_bytes'] < $b['total_bytes']) ? 1 : -1;
+	}
+
+	function get_bytesPerSecond_of_interface($interfaceName, $interfaceStats, &$in_bps, &$out_bps){
 		global $traffic_last_ugmt, $traffic_last_ifin, $traffic_last_ifout;
-		/* get the interface stats (code from ifstats.php)*/
-		$ifinfo = pfSense_get_interface_stats($realif);
 
 		/* get the current time (code from ifstats.php)*/
 		$temp = gettimeofday();
 		$timing = (double)$temp["sec"] + (double)$temp["usec"] / 1000000.0;
 		/* calculate the traffic stats */
-		$deltatime = $timing - $traffic_last_ugmt[$realif];
+		$deltatime = $timing - $traffic_last_ugmt[$interfaceName];
 
-		$in_data_bps	= ((double)$ifinfo['inbytes']	- $traffic_last_ifin[$realif])	/ $deltatime;
-		$out_data_bps = ((double)$ifinfo['outbytes'] - $traffic_last_ifout[$realif]) / $deltatime;
+		$in_bps  = ((double)$interfaceStats['inbytes']  - $traffic_last_ifin[$interfaceName])  / $deltatime;
+		$out_bps = ((double)$interfaceStats['outbytes'] - $traffic_last_ifout[$interfaceName]) / $deltatime;
 
-		$traffic_last_ugmt[$realif] = $timing;
-		$traffic_last_ifin[$realif] = (double)$ifinfo['inbytes'];
-		$traffic_last_ifout[$realif] = (double)$ifinfo['outbytes'];
+		$traffic_last_ugmt[$interfaceName]  = $timing;
+		$traffic_last_ifin[$interfaceName]  = (double)$interfaceStats['inbytes'];
+		$traffic_last_ifout[$interfaceName] = (double)$interfaceStats['outbytes'];
 	}
 
-	function interfaceTrafficList_toStringArray($interfaceTrafficList, $outputLength) {
+	function interfaceTrafficList_toStringArray_bps($interfaceTrafficList, $outputLength) {
 
 		$result = array();
 
 		foreach($interfaceTrafficList as $interfaceEntry) {
-			$result[] = format_interface_string($interfaceEntry, $outputLength);
+			$result[] = format_interface_string($interfaceEntry, 'in_bps', 'out_bps', true, $outputLength);
+		}
+		return $result;
+	}
+
+	function interfaceTrafficList_toStringArray_bytesToday($interfaceTrafficList, $outputLength) {
+
+		$result = array();
+
+		foreach($interfaceTrafficList as $interfaceEntry) {
+			$result[] = format_interface_string($interfaceEntry, 'in_bytes', 'out_bytes', false, $outputLength);
 		}
 
 		return $result;
 	}
 
-	function format_interface_string($interfaceEntry, $outputLength) {
+	function format_interface_string($interfaceEntry, $in_key, $out_key, $output_in_bits, $outputLength) {
 
-		$speed = " " . trim(formatSpeedBits_Short($interfaceEntry['in_bps'])) . "/" . trim(formatSpeedBits_Short($interfaceEntry['out_bps']));
+		if ($output_in_bits) {
+			$speed = " " . formatSpeedShort_bits($interfaceEntry[$in_key]) . "/" . formatSpeedShort_bits($interfaceEntry[$out_key]);
+		} else {
+			$speed = " " . formatSizeShort_bytes($interfaceEntry[$in_key]) . "/" . formatSizeShort_bytes($interfaceEntry[$out_key]);
+		}
 
 		$nameLength = $outputLength - strlen($speed);
 
@@ -619,61 +652,94 @@
 
 		$interfaceEntry = $interface_traffic_list[$realif];
 
-		$in_data  = "IN:  " . formatSpeedBits_Long($interfaceEntry['in_bps']);
-		$out_data = "OUT: " . formatSpeedBits_Long($interfaceEntry['out_bps']);
+		$in_data  = "IN:  " . formatSpeedLong_bits($interfaceEntry['in_bps']);
+		$out_data = "OUT: " . formatSpeedLong_bits($interfaceEntry['out_bps']);
 	}
 
-	function formatSpeedBits_Long($speed) {
+	function formatSpeedLong_bits($speed_in_bytes) {
 		/* format speed in bits/sec, input: bytes/sec
 		Code from: graph.php ported to PHP*/
-		if ($speed < 125000)
-			{return sprintf("%5.1f Kbps", $speed / 125);}
-		if ($speed < 125000000)
-			{return sprintf("%5.1f Mbps", $speed / 125000);}
+		if ($speed_in_bytes < 125000)
+			{return sprintf("%5.1f Kbps", $speed_in_bytes / 125);}
+		if ($speed_in_bytes < 125000000)
+			{return sprintf("%5.1f Mbps", $speed_in_bytes / 125000);}
 		// else
-		return sprintf("%5.1f Gbps", $speed / 125000000);
+		return sprintf("%5.1f Gbps", $speed_in_bytes / 125000000);
 	}
 
-	function formatSpeedBits_Short($speed) {
-		/* format speed in bits/sec, input: bytes/sec
-		Code from: graph.php ported to PHP*/
-		if ($speed < 125000)
-		{return sprintf("%5.1fK", $speed / 125);}
-		if ($speed < 125000000)
-		{return sprintf("%5.1fM", $speed / 125000);}
-		// else
-		return sprintf("%5.1fG", $speed / 125000000);
+	function formatSpeedShort_bits($speed_in_bytes) {
+		// format a byte-count into a bit-count with two significant figures or more, plus unit.
+		//
+		// The decimal SI kilobot definition of 1 kbit/s = 1000 bit/s, is used uniformly in the
+		// context of telecommunication transmission, so return kb rather than Kb
+
+		if ($speed_in_bytes < 125000) {
+			$unit = "k";
+			$unitSpeed = $speed_in_bytes / 125;
+		} else if ($speed_in_bytes < 125000000) {
+			$unit = "m";
+			$unitSpeed = $speed_in_bytes / 125000;
+		} else {
+			$unit = "g";
+			$unitSpeed = $speed_in_bytes / 125000000;
+		}
+
+		$showDecimalPlace = $unitSpeed < 10 && round($unitSpeed, 1) != round($unitSpeed);
+
+		return sprintf($showDecimalPlace ? "%1.1f" : "%1.0f", $unitSpeed) . $unit;
 	}
+
+	function formatSizeShort_bytes($size_in_bytes) {
+		// format a byte count into two significant figures or more with a unit
+		//
+		// Data sizes are normally specified in KB - powers of 1024, so return KB rather than kB
+
+		if ($size_in_bytes < (1024 * 1024)) {
+			$unit = "K";
+			$unitSize = $size_in_bytes / 1024;
+		} else if ($size_in_bytes < (1024 * 1024 * 1024)) {
+			$unit = "M";
+			$unitSize = $size_in_bytes / (1024 * 1024);
+		} else {
+			$unit = "G";
+			$unitSize = $size_in_bytes / (1024 * 1024 * 1024);
+		}
+
+		$showDecimalPlace = $unitSize < 10 && round($unitSize, 1) != round($unitSize);
+
+		return sprintf($showDecimalPlace ? "%1.1f" : "%1.0f", $unitSize) . $unit;
+	}
+
 
 	function add_summary_declaration(&$lcd_cmds, $name) {
 		$lcdpanel_height = get_lcdpanel_height();
 		$lcdpanel_width = get_lcdpanel_width();
 		if ($lcdpanel_height >= "4")
 		{
-			$lcd_cmds[] = "widget_add $name title_summary string";					
+			$lcd_cmds[] = "widget_add $name title_summary string";
 			$lcd_cmds[] = "widget_add $name text_summary string";
 			if ($lcdpanel_width > "16")
 				{$lcd_cmds[] = "widget_set $name title_summary 1 3 \"CPU MEM STATES FREQ\"";}
 			else
-				{$lcd_cmds[] = "widget_set $name title_summary 1 3 \"CPU MEM STATES\"";}			
-		}				
+				{$lcd_cmds[] = "widget_set $name title_summary 1 3 \"CPU MEM STATES\"";}
+		}
 	}
-	
+
 	function add_summary_values(&$lcd_cmds, $name, $lcd_summary_data) {
 		if ($lcd_summary_data != "")
 		{
 			$lcd_cmds[] = "widget_set $name text_summary 1 4 \"{$lcd_summary_data}\"";
 		}
 	}
-	
+
 	function build_interface($lcd) {
 		global $g;
 		global $config;
-		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];		
+		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 		$lcdpanel_width = get_lcdpanel_width();
 		$lcdpanel_height = get_lcdpanel_height();
 		$refresh_frequency = get_lcdpanel_refresh_frequency() * 8;
-		
+
 		$lcd_cmds = array();
 		$lcd_cmds[] = "hello";
 		$lcd_cmds[] = "client_set name pfSense";
@@ -699,8 +765,8 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
-							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"Welcome to\"";							
-							break;					
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"Welcome to\"";
+							break;
 						case "scr_time":
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
@@ -708,7 +774,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
-							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Time\"";							
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Time\"";
 							break;
 						case "scr_uptime":
 							$lcd_cmds[] = "screen_add $name";
@@ -758,7 +824,7 @@
 						case "scr_states":
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
-							$lcd_cmds[] = "screen_set $name name $name"; 
+							$lcd_cmds[] = "screen_set $name name $name";
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
@@ -780,7 +846,7 @@
 							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
-							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ IPsec Tunnels\"";							
+							$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ IPsec Tunnels\"";
 							break;
 						case "scr_slbd":
 							$lcd_cmds[] = "screen_add $name";
@@ -826,7 +892,8 @@
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt string";
 							break;
-						case "scr_traffic_interface_list":
+						case "scr_top_interfaces_by_bps":
+						case "scr_top_interfaces_by_bytes_today":
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
@@ -858,7 +925,7 @@
 		if(empty($g['product_name'])) {
 			$g['product_name'] = "pfSense";
 		}
-		
+
 		$refresh_frequency = get_lcdpanel_refresh_frequency();
 		/* keep a counter to see how many times we can loop */
 		$i = 1;
@@ -869,14 +936,14 @@
 				$lcd_summary_data = sprintf("%02d%% %02d%% %6d", cpu_usage(),  mem_usage(), $summary_states[0]);
 				if ($lcdpanel_width > "16") {
 					$lcd_summary_data = $lcd_summary_data . sprintf(" %3d%%", get_cpufrequency_perc());
-				}				
+				}
 			}
-			else {	
+			else {
 				$lcd_summary_data = "";}
 
 			$lcd_cmds = array();
 			$interfaceTrafficList = null;
-			
+
 			/* initializes the widget counter */
 			$widget_counter = 0;
 
@@ -915,11 +982,11 @@
 					break;
 					case 1: /* All Gateways up */
 						$led_output_value = $led_output_value + pow(2, 3);
-				}				
+				}
 				/* Sends the command to the panel */
 				$lcd_cmds[] = "output {$led_output_value}";
 			}
-			
+
 			/* process screens to display */
 			foreach((array) $lcdproc_screens_config as $name => $screen) {
 				if($screen != "on") {
@@ -932,7 +999,7 @@
 					case "scr_version":
 						$version = get_version();
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$version}\"";
-						break;				
+						break;
 					case "scr_time":
 						$time = date("n/j/Y H:i");
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$time}\"";
@@ -988,17 +1055,34 @@
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$cpufreq}\"";
 						break;
 					case "scr_traffic":
-						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interface_traffic_list(); // We only want get_interface_traffic_list() to be called once per loop, and only if it's needed
+						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interfaces_by_bps(); // We only want get_interfaces_by_bps() to be called once per loop, and only if it's needed
 						get_selected_interface_traffic_stats_longStrings($interfaceTrafficList, $in_data, $out_data);
 
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$in_data}\"";
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 \"{$out_data}\"";
 						break;
-					case "scr_traffic_interface_list":
-						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interface_traffic_list(); // We only want get_interface_traffic_list() to be called once per loop, and only if it's needed
-						$interfaceTrafficStrings = interfaceTrafficList_toStringArray($interfaceTrafficList, $lcdpanel_width);
+					case "scr_top_interfaces_by_bps":
+						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interface_traffic_stats_list(); // We only want get_interface_traffic_stats_list() to be called once per loop, and only if it's needed
+
+						sort_interface_list_by_bps($interfaceTrafficList);
+						$interfaceTrafficStrings = interfaceTrafficList_toStringArray_bps($interfaceTrafficList, $lcdpanel_width);
 
 						$title = ($lcdpanel_width >= 20) ? "Interface bps IN/OUT" : "Intf. bps IN/OUT";
+						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$title}\"";
+
+						for($i = 0; $i < ($lcdpanel_height - 1) && i < count($interfaceTrafficStrings); $i++) {
+
+							$lcd_cmds[] = "widget_set $name text_wdgt{$i} 1 " . ($i + 2) . " \"{$interfaceTrafficStrings[$i]}\"";
+						}
+						$updateSummary = false;
+						break;
+					case "scr_top_interfaces_by_bytes_today":
+						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interface_traffic_stats_list(); // We only want get_interface_traffic_stats_list() to be called once per loop, and only if it's needed
+
+						sort_interface_list_by_bytesToday($interfaceTrafficList);
+						$interfaceTrafficStrings = interfaceTrafficList_toStringArray_bytesToday($interfaceTrafficList, $lcdpanel_width);
+
+						$title = ($lcdpanel_width >= 20) ? "Total today   IN/OUT" : "Today   IN / OUT";
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$title}\"";
 
 						for($i = 0; $i < ($lcdpanel_height - 1) && i < count($interfaceTrafficStrings); $i++) {
@@ -1012,7 +1096,7 @@
 					$widget_counter++;
 					if ($updateSummary) add_summary_values($lcd_cmds, $name, $lcd_summary_data);
 				}
-			}			
+			}
 			if (send_lcd_commands($lcd, $lcd_cmds)) {
 				$lcdproc_connect_errors = 0; // Reset the error counter
 			}
@@ -1020,7 +1104,7 @@
 				return;
 			}
 			if (($refresh_frequency * $widget_counter) > 5) {
-				sleep(5); 
+				sleep(5);
 			}
 			else {
 				sleep($refresh_frequency * $widget_counter);
@@ -1039,19 +1123,19 @@
 	while ($lcdproc_connect_errors <= $lcdproc_max_connect_errors)
 	{
 		lcdproc_warn("Start client procedure. Error counter: ($lcdproc_connect_errors)");
-		sleep(1);	
+		sleep(1);
 		$lcd = fsockopen(LCDPROC_HOST, LCDPROC_PORT, $errno, $errstr, 10);
 		stream_set_timeout($lcd, 0 , 25000); // Sets the socket timeout as 25ms
 		if (!$lcd) {
 			lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
 			$lcdproc_connect_errors++;
-		} else {			
+		} else {
 			/* Allow the script to run forever (0) */
 			set_time_limit(0);
 			build_interface($lcd);
 			loop_status($lcd);
 			fclose($lcd);
-		}		
+		}
 	}
 	if ($lcdproc_connect_errors >= $lcdproc_max_connect_errors)
 	{

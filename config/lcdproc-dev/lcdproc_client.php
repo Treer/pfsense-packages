@@ -3,7 +3,7 @@
 /*
         lcdproc_client.php
         Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
-		Copyright (C) 2012 Michele Di Maria <michele@nt2.it>
+        Copyright (C) 2012 Michele Di Maria <michele@nt2.it>
         All rights reserved.
 
         Redistribution and use in source and binary forms, with or without
@@ -526,41 +526,125 @@
 		return 1;
 	}
 	
-	function get_traffic_stats(&$in_data, &$out_data){
+
+	function get_interface_traffic_list() {
+		/* Returns a sorted list of all the interfaces along with their in/out traffic,
+			sorted by total traffic */
 		global $config;
+
+		$result = array();
+
+		foreach($config['interfaces'] as $interface) {
+
+			get_bytesPerSecond_of_interface($interface['if'], $in_bps, $out_bps);
+
+			$entry = array();
+			$entry['descr']		 = $interface['descr'];
+			$entry['in_bps']		= $in_bps;
+			$entry['out_bps']	 = $out_bps;
+			$entry['total_bps'] = $in_bps + $out_bps;
+
+			$result[$interface['if']] = $entry;
+		}
+		uasort($result, "cmp_total_bps");
+
+		return $result;
+	}
+
+	function cmp_total_bps($a, $b)
+	{
+			if ($a['total_bps'] == $b['total_bps']) {
+					return 0;
+			}
+			return ($a['total_bps'] < $b['total_bps']) ? 1 : -1;
+	}
+
+	function get_bytesPerSecond_of_interface($realif, &$in_data_bps, &$out_data_bps){
 		global $traffic_last_ugmt, $traffic_last_ifin, $traffic_last_ifout;
-		$lcdproc_screen_config = $config['installedpackages']['lcdprocscreens']['config'][0];	
-		/* read the configured interface */
-		$ifnum = $lcdproc_screen_config['scr_traffic_interface'];
-		/* get the real interface name (code from ifstats.php)*/
-		$realif = get_real_interface($ifnum);
-		if(!$realif)
-			$realif = $ifnum; // Need for IPSec case interface.
 		/* get the interface stats (code from ifstats.php)*/
 		$ifinfo = pfSense_get_interface_stats($realif);
+
 		/* get the current time (code from ifstats.php)*/
 		$temp = gettimeofday();
 		$timing = (double)$temp["sec"] + (double)$temp["usec"] / 1000000.0;
 		/* calculate the traffic stats */
-		$deltatime = $timing - $traffic_last_ugmt;
-		$in_data = "IN:  " . formatSpeedBits(((double)$ifinfo['inbytes']-$traffic_last_ifin)/$deltatime);
-		$out_data = "OUT: " . formatSpeedBits(((double)$ifinfo['outbytes']-$traffic_last_ifout)/$deltatime);
-		$traffic_last_ugmt = $timing;
-		$traffic_last_ifin = (double)$ifinfo['inbytes'];
-		$traffic_last_ifout = (double)$ifinfo['outbytes'];
+		$deltatime = $timing - $traffic_last_ugmt[$realif];
+
+		$in_data_bps	= ((double)$ifinfo['inbytes']	- $traffic_last_ifin[$realif])	/ $deltatime;
+		$out_data_bps = ((double)$ifinfo['outbytes'] - $traffic_last_ifout[$realif]) / $deltatime;
+
+		$traffic_last_ugmt[$realif] = $timing;
+		$traffic_last_ifin[$realif] = (double)$ifinfo['inbytes'];
+		$traffic_last_ifout[$realif] = (double)$ifinfo['outbytes'];
 	}
-	
-	function formatSpeedBits($speed) {
-	  /* format speed in bits/sec, input: bytes/sec 
-	  Code from: graph.php ported to PHP*/	  
-	  if ($speed < 125000)
-		{return sprintf("%5.1f Kbps", $speed / 125);}		
-	  if ($speed < 125000000)
-		{return sprintf("%5.1f Mbps", $speed / 125000);}
-	  // else
-	  return sprintf("%5.1f Gbps", $speed / 125000000);
+
+	function interfaceTrafficList_toStringArray($interfaceTrafficList, $outputLength) {
+
+		$result = array();
+
+		foreach($interfaceTrafficList as $interfaceEntry) {
+			$result[] = format_interface_string($interfaceEntry, $outputLength);
+		}
+
+		return $result;
 	}
-	
+
+	function format_interface_string($interfaceEntry, $outputLength) {
+
+		$speed = " " . trim(formatSpeedBits_Short($interfaceEntry['in_bps'])) . "/" . trim(formatSpeedBits_Short($interfaceEntry['out_bps']));
+
+		$nameLength = $outputLength - strlen($speed);
+
+		if ($nameLength < 0) {
+			// owch - speed doesn't even fit on the lcd
+			$speed = substr(trim($speed), 0, $outputLength);
+			$name = '';
+		} else {
+			$name = substr($interfaceEntry['descr'], 0, $nameLength);
+			$name = str_pad($name, $nameLength);
+		}
+
+		return $name . $speed;
+	}
+
+	function get_selected_interface_traffic_stats_longStrings($interface_traffic_list, &$in_data, &$out_data){
+
+		global $config;
+		$lcdproc_screen_config = $config['installedpackages']['lcdprocscreens']['config'][0];
+		/* read the configured interface */
+		$ifnum = $lcdproc_screen_config['scr_traffic_interface'];
+		/* get the real interface name (code from ifstats.php)*/
+		$realif = get_real_interface($ifnum);
+		if(!$realif) $realif = $ifnum; // Need for IPSec case interface.
+
+		$interfaceEntry = $interface_traffic_list[$realif];
+
+		$in_data  = "IN:  " . formatSpeedBits_Long($interfaceEntry['in_bps']);
+		$out_data = "OUT: " . formatSpeedBits_Long($interfaceEntry['out_bps']);
+	}
+
+	function formatSpeedBits_Long($speed) {
+		/* format speed in bits/sec, input: bytes/sec
+		Code from: graph.php ported to PHP*/
+		if ($speed < 125000)
+			{return sprintf("%5.1f Kbps", $speed / 125);}
+		if ($speed < 125000000)
+			{return sprintf("%5.1f Mbps", $speed / 125000);}
+		// else
+		return sprintf("%5.1f Gbps", $speed / 125000000);
+	}
+
+	function formatSpeedBits_Short($speed) {
+		/* format speed in bits/sec, input: bytes/sec
+		Code from: graph.php ported to PHP*/
+		if ($speed < 125000)
+		{return sprintf("%5.1fK", $speed / 125);}
+		if ($speed < 125000000)
+		{return sprintf("%5.1fM", $speed / 125000);}
+		// else
+		return sprintf("%5.1fG", $speed / 125000000);
+	}
+
 	function add_summary_declaration(&$lcd_cmds, $name) {
 		$lcdpanel_height = get_lcdpanel_height();
 		$lcdpanel_width = get_lcdpanel_width();
@@ -586,6 +670,8 @@
 		global $g;
 		global $config;
 		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];		
+		$lcdpanel_width = get_lcdpanel_width();
+		$lcdpanel_height = get_lcdpanel_height();
 		$refresh_frequency = get_lcdpanel_refresh_frequency() * 8;
 		
 		$lcd_cmds = array();
@@ -595,7 +681,16 @@
 		/* process screens to display */
 		if(is_array($lcdproc_screens_config)) {
 			foreach($lcdproc_screens_config as $name => $screen) {
+
+				// Every time I restarted lcdproc, more duplicate screens would get created on the LCD,
+				// deleting screens before building them seems to automatically avoid this without any
+				// side-effects that I've noticed.
+				$lcd_cmds[] = "screen_del $name";
+
 				if($screen == "on") {
+
+					$includeSummary = true;
+
 					switch($name) {
 						case "scr_version":
 							$lcd_cmds[] = "screen_add $name";
@@ -731,8 +826,21 @@
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt string";
 							break;
+						case "scr_traffic_interface_list":
+							$lcd_cmds[] = "screen_add $name";
+							$lcd_cmds[] = "screen_set $name heartbeat off";
+							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
+							$lcd_cmds[] = "widget_add $name title_wdgt string";
+
+							for($i = 0; $i < ($lcdpanel_height - 1); $i++) {
+								$lcd_cmds[] = "widget_add $name text_wdgt{$i} string";
+							}
+							$includeSummary = false; // this screen needs all the lines
+							break;
+
 					}
-					add_summary_declaration($lcd_cmds, $name);
+					if ($includeSummary) add_summary_declaration($lcd_cmds, $name);
 				}
 			}
 		}
@@ -743,6 +851,7 @@
 		global $g;
 		global $config;
 		global $lcdproc_connect_errors;
+		global $timeOfLastUpdate;
 		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 		$lcdpanel_width = get_lcdpanel_width();
 		$lcdpanel_height = get_lcdpanel_height();
@@ -766,6 +875,7 @@
 				$lcd_summary_data = "";}
 
 			$lcd_cmds = array();
+			$interfaceTrafficList = null;
 			
 			/* initializes the widget counter */
 			$widget_counter = 0;
@@ -815,6 +925,9 @@
 				if($screen != "on") {
 					continue;
 				}
+
+				$updateSummary = true;
+
 				switch($name) {
 					case "scr_version":
 						$version = get_version();
@@ -875,14 +988,29 @@
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$cpufreq}\"";
 						break;
 					case "scr_traffic":
-						get_traffic_stats($in_data, $out_data);
+						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interface_traffic_list(); // We only want get_interface_traffic_list() to be called once per loop, and only if it's needed
+						get_selected_interface_traffic_stats_longStrings($interfaceTrafficList, $in_data, $out_data);
+
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$in_data}\"";
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 \"{$out_data}\"";
-						break;					
+						break;
+					case "scr_traffic_interface_list":
+						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interface_traffic_list(); // We only want get_interface_traffic_list() to be called once per loop, and only if it's needed
+						$interfaceTrafficStrings = interfaceTrafficList_toStringArray($interfaceTrafficList, $lcdpanel_width);
+
+						$title = ($lcdpanel_width >= 20) ? "Interface bps IN/OUT" : "Intf. bps IN/OUT";
+						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$title}\"";
+
+						for($i = 0; $i < ($lcdpanel_height - 1) && i < count($interfaceTrafficStrings); $i++) {
+
+							$lcd_cmds[] = "widget_set $name text_wdgt{$i} 1 " . ($i + 2) . " \"{$interfaceTrafficStrings[$i]}\"";
+						}
+						$updateSummary = false;
+						break;
 				}
-				if ($name != "scr_traffic_interface") {
+				if ($name != "scr_traffic_interface") {	// "scr_traffic_interface" isn't a real screen, it's a parameter for the "scr_traffic" screen
 					$widget_counter++;
-					add_summary_values($lcd_cmds, $name, $lcd_summary_data);
+					if ($updateSummary) add_summary_values($lcd_cmds, $name, $lcd_summary_data);
 				}
 			}			
 			if (send_lcd_commands($lcd, $lcd_cmds)) {
@@ -901,9 +1029,9 @@
 		}
 	}
 	/* Initialize the wan traffic counters */
-	$traffic_last_ugmt = 0;
-	$traffic_last_ifin = 0;
-	$traffic_last_ifout = 0;
+	$traffic_last_ugmt  = array();
+	$traffic_last_ifin  = array();
+	$traffic_last_ifout = array();
 	/* Initialize the global error counter */
 	$lcdproc_connect_errors = 0;
 	$lcdproc_max_connect_errors = 3;

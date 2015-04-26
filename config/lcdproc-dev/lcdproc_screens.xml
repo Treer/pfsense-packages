@@ -94,7 +94,12 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Enable Interface Traffic</fielddescr>
+			<fielddescr>Enable List of Interfaces by Traffic</fielddescr>
+			<fieldname>scr_traffic_interface_list</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable Single-interface Traffic</fielddescr>
 			<fieldname>scr_traffic</fieldname>
 			<type>checkbox</type>
 		</field>

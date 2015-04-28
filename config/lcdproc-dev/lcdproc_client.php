@@ -526,9 +526,9 @@
 		return 1;
 	}
 
-	function get_interface_traffic_stats_list() {
-		/* Returns a dictionary of all the interfaces along with their in/out traffic,
-		   keyed on the interface name */
+	function build_interface_traffic_stats_list() {
+		// Returns a dictionary of all the interfaces along with their in/out
+		// traffic stats, keyed on the interface name.
 		global $config;
 
 		$result = array();
@@ -538,14 +538,14 @@
 			$interfaceName = $interface['if'];
 			$interfaceStats = pfSense_get_interface_stats($interfaceName);
 
-			get_bytesPerSecond_of_interface($interfaceName, $interfaceStats, $in_bps, $out_bps);
+			calculate_interfaceBytesPerSecond_sinceLastChecked($interfaceName, $interfaceStats, $in_Bps, $out_Bps);
 
 			$entry = array();
 			$entry['descr']       = $interface['descr'];
 
-			$entry['in_bps']      = $in_bps;
-			$entry['out_bps']     = $out_bps;
-			$entry['total_bps']   = $in_bps + $out_bps;
+			$entry['in_Bps']      = $in_Bps;
+			$entry['out_Bps']     = $out_Bps;
+			$entry['total_Bps']   = $in_Bps + $out_Bps;
 
 			$entry['in_bytes']    = $interfaceStats['inbytes'];
 			$entry['out_bytes']   = $interfaceStats['outbytes'];
@@ -556,74 +556,56 @@
 		return $result;
 	}
 
-	function sort_interface_list_by_bytesToday($interfaceTrafficStatsList) {
+	function sort_interface_list_by_bytesToday(&$interfaceTrafficStatsList) {
 		uasort($interfaceTrafficStatsList, "cmp_total_bytes");
 	}
 
-	function sort_interface_list_by_bps($interfaceTrafficStatsList) {
-		uasort($interfaceTrafficStatsList, "cmp_total_bps");
+	function sort_interface_list_by_bps(&$interfaceTrafficStatsList) {
+		uasort($interfaceTrafficStatsList, "cmp_total_Bps");
 	}
 
-	function cmp_total_bps($a, $b)
+	function cmp_total_Bps($a, $b)
 	{
-			if ($a['total_bps'] == $b['total_bps']) {
-					return 0;
-			}
-			return ($a['total_bps'] < $b['total_bps']) ? 1 : -1;
+		if ($a['total_Bps'] == $b['total_Bps']) return 0;
+
+		return ($a['total_Bps'] < $b['total_Bps']) ? 1 : -1;
 	}
 
 	function cmp_total_bytes($a, $b)
 	{
-			if ($a['total_bytes'] == $b['total_bytes']) {
-					return 0;
-			}
-			return ($a['total_bytes'] < $b['total_bytes']) ? 1 : -1;
+		if ($a['total_bytes'] == $b['total_bytes']) return 0;
+
+		return ($a['total_bytes'] < $b['total_bytes']) ? 1 : -1;
 	}
 
-	function get_bytesPerSecond_of_interface($interfaceName, $interfaceStats, &$in_bps, &$out_bps){
+	function calculate_interfaceBytesPerSecond_sinceLastChecked($interfaceName, $interfaceStats, &$in_Bps, &$out_Bps) {
+		// calculates the average bytes-per-second (in & out) for the interface
+		// during the interval between now and the last time this method was invoked for
+		// the interface. So avoid invoking this method needlessly, or you'll end up
+		// measuring meaningless periods.
+
 		global $traffic_last_ugmt, $traffic_last_ifin, $traffic_last_ifout;
 
-		/* get the current time (code from ifstats.php)*/
+		// get the current time (code from ifstats.php)
 		$temp = gettimeofday();
 		$timing = (double)$temp["sec"] + (double)$temp["usec"] / 1000000.0;
-		/* calculate the traffic stats */
-		$deltatime = $timing - $traffic_last_ugmt[$interfaceName];
 
-		$in_bps  = ((double)$interfaceStats['inbytes']  - $traffic_last_ifin[$interfaceName])  / $deltatime;
-		$out_bps = ((double)$interfaceStats['outbytes'] - $traffic_last_ifout[$interfaceName]) / $deltatime;
+		// calculate the traffic stats
+		$deltatime = $timing - $traffic_last_ugmt[$interfaceName];
+		$in_Bps  = ((double)$interfaceStats['inbytes']  - $traffic_last_ifin[$interfaceName])  / $deltatime;
+		$out_Bps = ((double)$interfaceStats['outbytes'] - $traffic_last_ifout[$interfaceName]) / $deltatime;
 
 		$traffic_last_ugmt[$interfaceName]  = $timing;
 		$traffic_last_ifin[$interfaceName]  = (double)$interfaceStats['inbytes'];
 		$traffic_last_ifout[$interfaceName] = (double)$interfaceStats['outbytes'];
 	}
 
-	function interfaceTrafficList_toStringArray_bps($interfaceTrafficList, $outputLength) {
-
-		$result = array();
-
-		foreach($interfaceTrafficList as $interfaceEntry) {
-			$result[] = format_interface_string($interfaceEntry, 'in_bps', 'out_bps', true, $outputLength);
-		}
-		return $result;
-	}
-
-	function interfaceTrafficList_toStringArray_bytesToday($interfaceTrafficList, $outputLength) {
-
-		$result = array();
-
-		foreach($interfaceTrafficList as $interfaceEntry) {
-			$result[] = format_interface_string($interfaceEntry, 'in_bytes', 'out_bytes', false, $outputLength);
-		}
-
-		return $result;
-	}
-
 	function format_interface_string($interfaceEntry, $in_key, $out_key, $output_in_bits, $outputLength) {
 
 		if ($output_in_bits) {
-			$speed = " " . formatSpeedShort_bits($interfaceEntry[$in_key]) . "/" . formatSpeedShort_bits($interfaceEntry[$out_key]);
+			$speed = " " . format_toSpeedInBits_shortForm($interfaceEntry[$in_key]) . "/" . format_toSpeedInBits_shortForm($interfaceEntry[$out_key]);
 		} else {
-			$speed = " " . formatSizeShort_bytes($interfaceEntry[$in_key]) . "/" . formatSizeShort_bytes($interfaceEntry[$out_key]);
+			$speed = " " . format_toSizeInBytes_shortForm($interfaceEntry[$in_key]) . "/" . format_toSizeInBytes_shortForm($interfaceEntry[$out_key]);
 		}
 
 		$nameLength = $outputLength - strlen($speed);
@@ -640,35 +622,29 @@
 		return $name . $speed;
 	}
 
-	function get_selected_interface_traffic_stats_longStrings($interface_traffic_list, &$in_data, &$out_data){
+	function format_toSizeInBytes_shortForm($size_in_bytes) {
+		// format a byte count into a string with two significant figures or more and a unit
+		//
+		// Data sizes are normally specified in KB - powers of 1024, so return KB rather than kB
 
-		global $config;
-		$lcdproc_screen_config = $config['installedpackages']['lcdprocscreens']['config'][0];
-		/* read the configured interface */
-		$ifnum = $lcdproc_screen_config['scr_traffic_interface'];
-		/* get the real interface name (code from ifstats.php)*/
-		$realif = get_real_interface($ifnum);
-		if(!$realif) $realif = $ifnum; // Need for IPSec case interface.
+		if ($size_in_bytes < (1024 * 1024)) {
+			$unit = "K";
+			$unitSize = $size_in_bytes / 1024;
+		} else if ($size_in_bytes < (1024 * 1024 * 1024)) {
+			$unit = "M";
+			$unitSize = $size_in_bytes / (1024 * 1024);
+		} else {
+			$unit = "G";
+			$unitSize = $size_in_bytes / (1024 * 1024 * 1024);
+		}
 
-		$interfaceEntry = $interface_traffic_list[$realif];
+		$showDecimalPlace = $unitSize < 10 && round($unitSize, 1) != round($unitSize);
 
-		$in_data  = "IN:  " . formatSpeedLong_bits($interfaceEntry['in_bps']);
-		$out_data = "OUT: " . formatSpeedLong_bits($interfaceEntry['out_bps']);
+		return sprintf($showDecimalPlace ? "%1.1f" : "%1.0f", $unitSize) . $unit;
 	}
 
-	function formatSpeedLong_bits($speed_in_bytes) {
-		/* format speed in bits/sec, input: bytes/sec
-		Code from: graph.php ported to PHP*/
-		if ($speed_in_bytes < 125000)
-			{return sprintf("%5.1f Kbps", $speed_in_bytes / 125);}
-		if ($speed_in_bytes < 125000000)
-			{return sprintf("%5.1f Mbps", $speed_in_bytes / 125000);}
-		// else
-		return sprintf("%5.1f Gbps", $speed_in_bytes / 125000000);
-	}
-
-	function formatSpeedShort_bits($speed_in_bytes) {
-		// format a byte-count into a bit-count with two significant figures or more, plus unit.
+	function format_toSpeedInBits_shortForm($speed_in_bytes) {
+		// format a byte-count into a bit-count string with two significant figures or more, and a unit.
 		//
 		// The decimal SI kilobot definition of 1 kbit/s = 1000 bit/s, is used uniformly in the
 		// context of telecommunication transmission, so return kb rather than Kb
@@ -689,27 +665,68 @@
 		return sprintf($showDecimalPlace ? "%1.1f" : "%1.0f", $unitSpeed) . $unit;
 	}
 
-	function formatSizeShort_bytes($size_in_bytes) {
-		// format a byte count into two significant figures or more with a unit
-		//
-		// Data sizes are normally specified in KB - powers of 1024, so return KB rather than kB
+	function format_toSpeedInBits_longForm($speed_in_bytes) {
+		/* format speed in bits/sec, input: bytes/sec
+		Code from: graph.php ported to PHP
 
-		if ($size_in_bytes < (1024 * 1024)) {
-			$unit = "K";
-			$unitSize = $size_in_bytes / 1024;
-		} else if ($size_in_bytes < (1024 * 1024 * 1024)) {
-			$unit = "M";
-			$unitSize = $size_in_bytes / (1024 * 1024);
-		} else {
-			$unit = "G";
-			$unitSize = $size_in_bytes / (1024 * 1024 * 1024);
-		}
+		The decimal SI kilobot definition of 1 kbit/s = 1000 bit/s, is used uniformly in the
+		context of telecommunication transmission, so return kb rather than Kb */
 
-		$showDecimalPlace = $unitSize < 10 && round($unitSize, 1) != round($unitSize);
-
-		return sprintf($showDecimalPlace ? "%1.1f" : "%1.0f", $unitSize) . $unit;
+		if ($speed_in_bytes < 125000)
+			{return sprintf("%5.1f kbps", $speed_in_bytes / 125);}
+		if ($speed_in_bytes < 125000000)
+			{return sprintf("%5.1f mbps", $speed_in_bytes / 125000);}
+		// else
+		return sprintf("%5.1f gbps", $speed_in_bytes / 125000000);
 	}
 
+	function get_traffic_stats($interface_traffic_list, &$in_data, &$out_data){
+
+		global $config;
+		$lcdproc_screen_config = $config['installedpackages']['lcdprocscreens']['config'][0];
+		/* read the configured interface */
+		$ifnum = $lcdproc_screen_config['scr_traffic_interface'];
+		/* get the real interface name (code from ifstats.php)*/
+		$realif = get_real_interface($ifnum);
+		if(!$realif) $realif = $ifnum; // Need for IPSec case interface.
+
+		$interfaceEntry = $interface_traffic_list[$realif];
+
+		$in_data  = "IN:  " . format_toSpeedInBits_longForm($interfaceEntry['in_Bps']);
+		$out_data = "OUT: " . format_toSpeedInBits_longForm($interfaceEntry['out_Bps']);
+	}
+
+	function get_top_interfaces_by_bps($interfaceTrafficList, $lcdpanel_width, $lcdpanel_height) {
+
+		$result = array();
+
+		if (count($interfaceTrafficList) < $lcdpanel_height) {
+			// All the interfaces will fit on the screen, so use the same sort order as
+			// the bytes_today screen, so that the interfaces stay in one place (much easier to read)
+			sort_interface_list_by_bytesToday($interfaceTrafficList);
+		} else {
+			// We can't show all the interfaces, so show the ones with the most traffic
+			sort_interface_list_by_bps($interfaceTrafficList);
+		}
+
+		foreach($interfaceTrafficList as $interfaceEntry) {
+			$result[] = format_interface_string($interfaceEntry, 'in_Bps', 'out_Bps', true, $lcdpanel_width);
+		}
+		return $result;
+	}
+
+	function get_top_interfaces_by_bytes_today($interfaceTrafficList, $lcdpanel_width) {
+
+		$result = array();
+
+		sort_interface_list_by_bytesToday($interfaceTrafficList);
+
+		foreach($interfaceTrafficList as $interfaceEntry) {
+			$result[] = format_interface_string($interfaceEntry, 'in_bytes', 'out_bytes', false, $lcdpanel_width);
+		}
+
+		return $result;
+	}
 
 	function add_summary_declaration(&$lcd_cmds, $name) {
 		$lcdpanel_height = get_lcdpanel_height();
@@ -1055,17 +1072,15 @@
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 $lcdpanel_width 2 h 4 \"{$cpufreq}\"";
 						break;
 					case "scr_traffic":
-						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interfaces_by_bps(); // We only want get_interfaces_by_bps() to be called once per loop, and only if it's needed
-						get_selected_interface_traffic_stats_longStrings($interfaceTrafficList, $in_data, $out_data);
+						if ($interfaceTrafficList == null) $interfaceTrafficList = build_interface_traffic_stats_list(); // We only want build_interface_traffic_stats_list() to be called once per loop, and only if it's needed
+						get_traffic_stats($interfaceTrafficList, $in_data, $out_data);
 
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$in_data}\"";
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 \"{$out_data}\"";
 						break;
 					case "scr_top_interfaces_by_bps":
-						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interface_traffic_stats_list(); // We only want get_interface_traffic_stats_list() to be called once per loop, and only if it's needed
-
-						sort_interface_list_by_bps($interfaceTrafficList);
-						$interfaceTrafficStrings = interfaceTrafficList_toStringArray_bps($interfaceTrafficList, $lcdpanel_width);
+						if ($interfaceTrafficList == null) $interfaceTrafficList = build_interface_traffic_stats_list(); // We only want build_interface_traffic_stats_list() to be called once per loop, and only if it's needed
+						$interfaceTrafficStrings = get_top_interfaces_by_bps($interfaceTrafficList, $lcdpanel_width, $lcdpanel_height);
 
 						$title = ($lcdpanel_width >= 20) ? "Interface bps IN/OUT" : "Intf. bps IN/OUT";
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$title}\"";
@@ -1077,10 +1092,8 @@
 						$updateSummary = false;
 						break;
 					case "scr_top_interfaces_by_bytes_today":
-						if ($interfaceTrafficList == null) $interfaceTrafficList = get_interface_traffic_stats_list(); // We only want get_interface_traffic_stats_list() to be called once per loop, and only if it's needed
-
-						sort_interface_list_by_bytesToday($interfaceTrafficList);
-						$interfaceTrafficStrings = interfaceTrafficList_toStringArray_bytesToday($interfaceTrafficList, $lcdpanel_width);
+						if ($interfaceTrafficList == null) $interfaceTrafficList = build_interface_traffic_stats_list(); // We only want build_interface_traffic_stats_list() to be called once per loop, and only if it's needed
+						$interfaceTrafficStrings = get_top_interfaces_by_bytes_today($interfaceTrafficList, $lcdpanel_width);
 
 						$title = ($lcdpanel_width >= 20) ? "Total today   IN/OUT" : "Today   IN / OUT";
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"{$title}\"";

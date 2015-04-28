@@ -24,23 +24,23 @@
 	</menu>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc.inc</item>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc_screens.xml</item>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc_client.php</item>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://files.pfsense.org/misc/nexcom.so</item>
-	    <prefix>/usr/local/lib/lcdproc/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/lib/lcdproc/</prefix>
+		<chmod>0755</chmod>
 	</additional_files_needed>
 	<service>
 		<name>lcdproc</name>
@@ -67,7 +67,7 @@
 				<option>
 					<value>com1</value>
 					<name>Serial Com port 1 (/dev/cua0)</name>
-				</option>				
+				</option>
 				<option>
 					<value>com2</value>
 					<name>Serial Com port 2 (/dev/cua1)</name>
@@ -79,7 +79,7 @@
 				<option>
 					<value>com2a</value>
 					<name>Serial Com port 2 alternate (/dev/cuau1)</name>
-				</option>				
+				</option>
 				<option>
 					<value>ucom1</value>
 					<name>USB Com port 1 (/dev/cuaU0)</name>
@@ -95,7 +95,7 @@
 				<option>
 					<value>ugen0.2</value>
 					<name>USB Com port 1 alternate (/dev/ugen0.2)</name>
-				</option>				
+				</option>
 				<option>
 					<value>ugen1.2</value>
 					<name>USB Com port 2 alternate (/dev/ugen1.2)</name>
@@ -107,7 +107,7 @@
 				<option>
 					<value>ugen2.2</value>
 					<name>USB Com port 4 alternate (/dev/ugen2.2)</name>
-				</option>				
+				</option>
 			</options>
 			<default_value>ucom1</default_value>
 		</field>
@@ -241,7 +241,7 @@
 				<option>
 					<value>nexcom</value>
 					<name>nexcom (x86 only)</name>
-				</option>				
+				</option>
 				<option>
 					<value>NoritakeVFD</value>
 					<name>NoritakeVFD</name>
@@ -249,15 +249,15 @@
 				<option>
 					<value>picolcd</value>
 					<name>picolcd</name>
-				</option>				
+				</option>
 				<option>
 					<value>pyramid</value>
 					<name>pyramid</name>
-				</option>				
+				</option>
 				<option>
 					<value>sdeclcd</value>
 					<name>Watchguard Firebox with SDEC</name>
-				</option>				
+				</option>
 				<option>
 					<value>sed1330</value>
 					<name>sed1330</name>
@@ -277,7 +277,7 @@
 				<option>
 					<value>shuttleVFD</value>
 					<name>shuttleVFD</name>
-				</option>				
+				</option>
 				<option>
 					<value>sli</value>
 					<name>sli</name>
@@ -289,7 +289,7 @@
 				<option>
 					<value>SureElec</value>
 					<name>SureElec</name>
-				</option>				
+				</option>
 				<option>
 					<value>t6963</value>
 					<name>t6963</name>
@@ -385,7 +385,7 @@
 				</option>
 			</options>
 			<default_value>lcd2usb</default_value>
-		</field>	
+		</field>
 		<field>
 			<fieldname>refresh_frequency</fieldname>
 			<fielddescr>Refresh frequency</fielddescr>
@@ -412,9 +412,13 @@
 					<value>10</value>
 					<name>10 seconds</name>
 				</option>
+				<option>
+					<value>15</value>
+					<name>15 seconds</name>
+				</option>
 			</options>
 			<default_value>5</default_value>
-		</field>	
+		</field>
 		<field>
 			<fieldname>port_speed</fieldname>
 			<fielddescr>Port speed</fielddescr>
@@ -448,7 +452,7 @@
 				<option>
 					<value>115200</value>
 					<name>115200 bps</name>
-				</option>				
+				</option>
 			</options>
 			<default_value>0</default_value>
 		</field>
@@ -473,11 +477,11 @@
 				<option>
 					<value>20</value>
 					<name>20%</name>
-				</option>	
+				</option>
 				<option>
 					<value>30</value>
 					<name>30%</name>
-				</option>	
+				</option>
 				<option>
 					<value>40</value>
 					<name>40%</name>
@@ -501,12 +505,12 @@
 				<option>
 					<value>90</value>
 					<name>90%</name>
-				</option>	
+				</option>
 				<option>
 					<value>100</value>
 					<name>100%</name>
 				</option>
-			</options>			
+			</options>
 			<default_value>-1</default_value>
 		</field>
 		<field>
@@ -530,11 +534,11 @@
 				<option>
 					<value>20</value>
 					<name>20%</name>
-				</option>	
+				</option>
 				<option>
 					<value>30</value>
 					<name>30%</name>
-				</option>	
+				</option>
 				<option>
 					<value>40</value>
 					<name>40%</name>
@@ -558,14 +562,14 @@
 				<option>
 					<value>90</value>
 					<name>90%</name>
-				</option>	
+				</option>
 				<option>
 					<value>100</value>
 					<name>100%</name>
 				</option>
-			</options>			
+			</options>
 			<default_value>-1</default_value>
-		</field>		
+		</field>
 		<field>
 			<fieldname>contrast</fieldname>
 			<fielddescr>Contrast</fielddescr>
@@ -587,11 +591,11 @@
 				<option>
 					<value>20</value>
 					<name>20%</name>
-				</option>	
+				</option>
 				<option>
 					<value>30</value>
 					<name>30%</name>
-				</option>	
+				</option>
 				<option>
 					<value>40</value>
 					<name>40%</name>
@@ -615,14 +619,14 @@
 				<option>
 					<value>90</value>
 					<name>90%</name>
-				</option>	
+				</option>
 				<option>
 					<value>100</value>
 					<name>100%</name>
 				</option>
-			</options>			
+			</options>
 			<default_value>-1</default_value>
-		</field>	
+		</field>
 		<field>
 			<fieldname>backlight</fieldname>
 			<fielddescr>Backlight</fielddescr>
@@ -655,7 +659,7 @@
 				LED4: Gateway status (green: ok, red: at least one gateway not responding, off: no gateway configured).</description>
 			<type>checkbox</type>
 			<default_value>default</default_value>
-		</field>		
+		</field>
 	</fields>
 	<custom_php_command_before_form>
 		before_form_lcdproc($pkg);

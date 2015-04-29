@@ -36,7 +36,7 @@ require_once("pkg-utils.inc");
 require_once("globals.inc");
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if (is_dir('/usr/pbi/postfix-' . php_uname("m"))) {
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
 } else {
 	define('POSTFIX_LOCALBASE','/usr/local');
@@ -766,6 +766,8 @@ MASTEREOF2;
 			}
 	if (!file_exists("/etc/mail/aliases"))
 		touch("/etc/mail/aliases");
+	if (!file_exists("/etc/aliases"))
+		@symlink("/etc/mail/aliases", "/etc/aliases");
 	exec("/usr/local/bin/newaliases");
 	postfix_start();
 
@@ -846,6 +848,7 @@ function postfix_php_deinstall_command() {
 	sync_package_postfix();
 	conf_mount_rw();
 	unlink_if_exists("/usr/local/etc/rc.d/postfix.sh");
+	unlink_if_exists("/etc/aliases");
 	conf_mount_ro();
 }
 

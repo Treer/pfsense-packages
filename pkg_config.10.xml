@@ -125,7 +125,7 @@
 		<category>Firewall</category>
 		<pkginfolink>https://forum.pfsense.org/index.php?topic=86212.0</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
-		<version>1.06</version>
+		<version>1.08</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>BBCan177@gmail.com</maintainer>
@@ -320,8 +320,9 @@
 		<descr>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</descr>
 		<category>Services</category>
 		<pkginfolink/>
+		<port_category>ftp</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/tftp2/tftp.xml</config_file>
-		<version>2.0</version>
+		<version>2.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>tftp.xml</configurationfile>
@@ -338,6 +339,7 @@
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>phpservice.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Backup</name>
@@ -346,7 +348,7 @@
 		<category>System</category>
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/backup/backup.xml</config_file>
-		<version>0.1.5</version>
+		<version>0.1.6</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -359,7 +361,7 @@
 		<category>Services</category>
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/cron/cron.xml</config_file>
-		<version>0.1.8</version>
+		<version>0.1.9</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -370,6 +372,7 @@
 		<website/>
 		<descr>It is a web server package that can host HTML, Javascript, CSS, and PHP. It uses the lighttpd web server that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite.</descr>
 		<category>Services</category>
+		<port_category>www</port_category>
 		<pkginfolink>https://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/vhosts/vhosts.xml</config_file>
 		<version>0.7.5</version>
@@ -377,6 +380,7 @@
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>vhosts.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>snort</name>
@@ -384,14 +388,16 @@
 		<website>http://www.snort.org</website>
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
+		<run_depends>bin/snort:security/snort</run_depends>
+		<port_category>security</port_category>
 		<depends_on_package_pbi>snort-2.9.7.2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;barnyard2_SET_FORCE=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET_FORCE=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET_FORCE=PULLEDPORK FILEINSPECT HA</build_options>
+		<build_options>barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;barnyard2_SET_FORCE=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET_FORCE=BARNYARD PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET_FORCE=PULLEDPORK FILEINSPECT HA</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.7.2 pkg v3.2.4</version>
+		<version>3.2.4</version>
 		<required_version>2.2</required_version>
 		<status>Stable</status>
 		<configurationfile>/snort.xml</configurationfile>
@@ -404,6 +410,8 @@
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/olsrd/olsrd.xml</config_file>
 		<depends_on_package_pbi>olsrd-0.6.6.2_1-##ARCH##.pbi</depends_on_package_pbi>
+		<run_depends>sbin/olsrd:net/olsrd</run_depends>
+		<port_category>net</port_category>
 		<build_pbi>
 			<port>net/olsrd</port>
 		</build_pbi>
@@ -417,6 +425,7 @@
 		<website>https://packages.pfsense.org/</website>
 		<descr>RIP v1 and v2 daemon.</descr>
 		<category>Network Management</category>
+		<port_category>net</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/routed/routed.xml</config_file>
 		<version>1.1</version>
 		<status>Stable</status>
@@ -430,9 +439,11 @@
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_pbi>spamd-4.9.1_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>4.9.1_2 v1.1.2</version>
+		<version>1.1.2</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
+		<port_category>mail</port_category>
+		<run_depends>sbin/spamdb:mail/spamd</run_depends>
 		<configurationfile>spamd.xml</configurationfile>
 		<build_pbi>
 			<port>mail/spamd</port>
@@ -444,6 +455,7 @@
 	</package>
 	<package>
 		<name>Postfix Forwarder</name>
+		<internal_name>Postfix_Forwarder</internal_name>
 		<website>http://www.postfix.org/</website>
 		<descr><![CDATA[Postfix mail forwarder acts as a relay server for your domain.<br />
 				It can do first and second line antispam combat before sending incoming mail to local mail servers.<br />
@@ -452,10 +464,12 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_pbi>postfix-2.11.3_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.11.3_2 pkg v.2.4.1</version>
+		<version>2.4.2</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
+		<port_category>mail</port_category>
+		<run_depends>bin/qshape:mail/postfix</run_depends>
 		<build_pbi>
 			<port>mail/postfix</port>
 		</build_pbi>
@@ -484,10 +498,10 @@
 		</build_pbi>
 		<build_options>dansguardian_UNSET_FORCE=APACHE;dansguardian_SET_FORCE=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>mailscanner</name>
-		<internal_name>mailscanner</internal_name>
 		<website>http://www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
 						This is a level3 mail scanning tool with high CPU load.]]></descr>
@@ -495,10 +509,12 @@
 		<config_file>https://packages.pfsense.org/packages/config/mailscanner/mailscanner.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
 		<depends_on_package_pbi>mailscanner-4.84.6-##ARCH##.pbi</depends_on_package_pbi>
-		<version>4.84.6 pkg v.0.2.12</version>
+		<version>0.2.12</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
+		<port_category>mail</port_category>
+		<run_depends>bin/cdcc:mail/dcc-dccd bin/pyzor:mail/pyzor bin/spfquery.pl:mail/p5-Mail-SPF bin/ip2cc:net/p5-IP-Country sbin/mailscanner:mail/mailscanner</run_depends>
 		<build_pbi>
 			<ports_before>mail/pyzor mail/p5-Mail-SPF net/p5-IP-Country mail/dcc-dccd</ports_before>
 			<port>mail/mailscanner</port>
@@ -514,10 +530,12 @@
 		<config_file>https://packages.pfsense.org/packages/config/siproxd/siproxd.xml</config_file>
 		<depends_on_package_pbi>siproxd-0.8.0_1-##ARCH##.pbi</depends_on_package_pbi>
 		<pkginfolink>https://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
+		<port_category>net</port_category>
+		<run_depends>sbin/siproxd:net/siproxd</run_depends>
 		<build_pbi>
 			<port>net/siproxd</port>
 		</build_pbi>
-		<version>0.8.0_1 pkg v1.0.3</version>
+		<version>1.0.3</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>siproxd.xml</configurationfile>
@@ -527,6 +545,8 @@
 		<descr>OpenBGPD is a FREE implementation of the Border Gateway Protocol, Version 4. It allows ordinary machines to be used as routers exchanging routes with other systems speaking the BGP protocol. -- WARNING! Installs files to the same place as Quagga OSPF. Installing both will result in a broken state, remove this package before installing Quagga OSPF.</descr>
 		<category>NET</category>
 		<config_file>https://packages.pfsense.org/packages/config/openbgpd/openbgpd.xml</config_file>
+		<port_category>net</port_category>
+		<run_depends>sbin/bgpctl:net/openbgpd</run_depends>
 		<build_pbi>
 			<port>net/openbgpd</port>
 		</build_pbi>
@@ -542,8 +562,10 @@
 		<descr>High performance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
-		<version>1.8.2 pkg v.2.36</version>
+		<version>2.39</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
+		<port_category>www</port_category>
+		<run_depends>libexec/lightsquid/ip2name.list:www/lightsquid</run_depends>
 		<depends_on_package_pbi>lightsquid-1.8_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>graphics/gd graphics/p5-GD</ports_before>
@@ -566,9 +588,11 @@
 		<config_file>https://packages.pfsense.org/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
 		<depends_on_package_pbi>sarg-2.3.9-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.3.9 pkg v.0.6.4</version>
+		<version>0.6.4</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
+		<port_category>www</port_category>
+		<run_depends>bin/sarg:www/sarg</run_depends>
 		<configurationfile>sarg.xml</configurationfile>
 		<build_pbi>
 			<port>www/sarg</port>
@@ -587,10 +611,12 @@
 		<config_file>https://packages.pfsense.org/packages/config/ipguard/ipguard.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,49917.msg263664.html#msg263664</pkginfolink>
 		<depends_on_package_pbi>ipguard-1.04_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.0.4_2 pkg v.0.1</version>
+		<version>0.1</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
+		<port_category>security</port_category>
+		<run_depends>sbin/ipguard:security/ipguard</run_depends>
 		<build_pbi>
 			<port>security/ipguard</port>
 		</build_pbi>
@@ -605,12 +631,14 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>3.0.5_3 pkg v.0.2.4</version>
+		<version>0.2.4</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_pbi>varnish-3.0.5_3-##ARCH##.pbi</depends_on_package_pbi>
+		<port_category>www</port_category>
+		<run_depends>bin/varnishadm:www/varnish</run_depends>
 		<build_pbi>
 			<port>www/varnish</port>
 			<ports_after>lang/gcc</ports_after>
@@ -624,10 +652,12 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
 		<depends_on_package_pbi>vnstat-1.12-##ARCH##.pbi</depends_on_package_pbi>
+		<port_category>net</port_category>
+		<run_depends>bin/vnstat:net/vnstat</run_depends>
 		<build_pbi>
 			<port>net/vnstat</port>
 		</build_pbi>
-		<version>1.12,3</version>
+		<version>1.12_3</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
@@ -646,6 +676,8 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/tinydns/tinydns.xml</config_file>
 		<configurationfile>tinydns.xml</configurationfile>
+		<port_category>dns</port_category>
+		<run_depends>bin/dnsq:dns/djbdns</run_depends>
 		<depends_on_package_pbi>djbdns-1.05_20-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
@@ -658,12 +690,14 @@
 		<descr>VMware Tools</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>Services</category>
-		<version>1280544_9_4</version>
+		<version>1280544_10</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.xml</config_file>
 		<configurationfile>open-vm-tools.xml</configurationfile>
+		<port_category>emulators</port_category>
+		<run_depends>bin/vmtoolsd:emulators/open-vm-tools-nox11</run_depends>
 		<build_pbi>
 			<port>emulators/open-vm-tools-nox11</port>
 		</build_pbi>
@@ -687,12 +721,14 @@
 		<descr>Broadcasts a who-has ARP packet on the network and prints answers. </descr>
 		<website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
 		<category>Services</category>
-		<version>2.14_1 v1.1</version>
+		<version>1.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arping/arping.xml</config_file>
 		<configurationfile>arping.xml</configurationfile>
 		<depends_on_package_pbi>arping-2.14_1-##ARCH##.pbi</depends_on_package_pbi>
+		<port_category>net</port_category>
+		<run_depends>sbin/arping:net/arping</run_depends>
 		<build_pbi>
 			<port>net/arping</port>
 		</build_pbi>
@@ -705,11 +741,13 @@
 		<category>Security</category>
 		<depends_on_package_pbi>nmap-6.47-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.47 pkg v1.3</version>
+		<version>1.3</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>nmap.xml</configurationfile>
+		<port_category>security</port_category>
+		<run_depends>bin/nmap:security/nmap</run_depends>
 		<build_pbi>
 			<port>security/nmap</port>
 		</build_pbi>
@@ -720,7 +758,7 @@
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
-		<version>20111108_2 pkg v 0.3.2</version>
+		<version>0.3.2</version>
 		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
@@ -728,6 +766,8 @@
 		<configurationfile>imspector.xml</configurationfile>
 		<depends_on_package_pbi>imspector-20111108_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_options>imspector_SET_FORCE=PLUGINS;imspector_UNSET_FORCE=IPFW</build_options>
+		<port_category>net-im</port_category>
+		<run_depends>sbin/imspector:net-im/imspector</run_depends>
 		<build_pbi>
 			<port>net-im/imspector</port>
 		</build_pbi>
@@ -737,13 +777,14 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.7.2_6 pkg 2.0.4</version>
+		<version>2.0.4</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
 		<depends_on_package_pbi>nut-2.7.2_6-##ARCH##.pbi</depends_on_package_pbi>
+		<run_depends>bin/upsc:sysutils/nut</run_depends>
 		<build_pbi>
 			<port>sysutils/nut</port>
 		</build_pbi>
@@ -770,9 +811,11 @@
 		<version>3.0.718</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
-		<maintainer>sullrich+pfsp@gmail.com</maintainer>
+		<maintainer>coreteam@pfsense.org</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/darkstat/darkstat.xml</config_file>
 		<configurationfile>darkstat.xml</configurationfile>
+		<port_category>net-mgmt</port_category>
+		<run_depends>sbin/darkstat:net-mgmt/darkstat</run_depends>
 		<build_pbi>
 			<port>net-mgmt/darkstat</port>
 		</build_pbi>
@@ -784,11 +827,12 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_pbi>pfflowd-0.8-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.8 pkg v1.0.2</version>
+		<version>1.0.2</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
-		<maintainer></maintainer>
+		<port_category>net</port_category>
+		<run_depends>sbin/pfflowd:net/pfflowd-0.8</run_depends>
 		<build_pbi>
 			<custom_name>pfflowd</custom_name>
 			<port>net/pfflowd-0.8</port>
@@ -806,6 +850,8 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/widentd/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
+		<port_category>net</port_category>
+		<run_depends>sbin/widentd:net/widentd</run_depends>
 		<build_pbi>
 			<port>net/widentd</port>
 		</build_pbi>
@@ -819,7 +865,7 @@
 					On pfSense docs there is a how-to which could help you on porting users.]]></descr>
 		<pkginfolink>https://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>2.2.6_3 pkg v1.6.11</version>
+		<version>1.6.11</version>
 		<status>RC1</status>
 		<required_version>2.2</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
@@ -827,7 +873,8 @@
 		<config_file>https://packages.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<after_install_info>Please visit Services: FreeRADIUS</after_install_info>
-		<!-- Try to use the new PBI build syntax here, it may help it pick up the right libs inside the single PBI rather than using multiple. -->
+		<port_category>net</port_category>
+		<run_depends>sbin/radiusd:net/freeradius2 bin/bash:shells/bash</run_depends>
 		<build_pbi>
 			<ports_before>security/krb5</ports_before>
 			<port>net/freeradius2</port>
@@ -840,12 +887,15 @@
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
 		<category>System</category>
-		<version>2.0.1_6 pkg v.0.5</version>
+		<version>0.5</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>bandwidthd-2.0.1_6-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
+		<port_category>net-mgmt</port_category>
+		<port_uses>USES=pgsql</port_uses>
+		<run_depends>bandwidthd/bandwidthd:net-mgmt/bandwidthd</run_depends>
 		<build_pbi>
 			<ports_before>net/libpcap databases/postgresql91-client graphics/gd</ports_before>
 			<port>net-mgmt/bandwidthd</port>
@@ -864,6 +914,8 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/stunnel/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
+		<port_category>security</port_category>
+		<run_depends>bin/stunnel:security/stunnel</run_depends>
 		<build_pbi>
 			<port>security/stunnel</port>
 		</build_pbi>
@@ -881,6 +933,8 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>iperf.xml</configurationfile>
+		<port_category>benchmarks</port_category>
+		<run_depends>bin/iperf:benchmarks/iperf</run_depends>
 		<build_pbi>
 			<port>benchmarks/iperf</port>
 		</build_pbi>
@@ -896,6 +950,8 @@
 		<required_version>2.2</required_version>
 		<status>ALPHA</status>
 		<configurationfile>netio.xml</configurationfile>
+		<port_category>benchmarks</port_category>
+		<run_depends>bin/netio:benchmarks/netio</run_depends>
 		<build_pbi>
 			<port>benchmarks/netio</port>
 		</build_pbi>
@@ -907,11 +963,13 @@
 		<website>http://www.bitwizard.nl/mtr/</website>
 		<category>Network Management</category>
 		<depends_on_package_pbi>mtr-0.85_1-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.85_1.1</version>
+		<version>0.85_2</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
+		<port_category>net</port_category>
+		<run_depends>sbin/mtr:net/mtr-nox11</run_depends>
 		<build_pbi>
 			<port>net/mtr</port>
 		</build_pbi>
@@ -964,17 +1022,21 @@
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.7_2 pkg.v.1.0.2</version>
+		<version>1.0.2</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
 		<depends_on_package_pbi>lcdproc-0.5.7_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
+		<port_category>sysutils</port_category>
+		<run_depends>bin/lcdproc:sysutils/lcdproc</run_depends>
+		<conflicts>LCDproc-dev</conflicts>
 		<build_pbi>
 			<port>sysutils/lcdproc</port>
 		</build_pbi>
 		<build_options>lcdproc_SET_FORCE=USB</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>LCDproc-dev</name>
@@ -982,7 +1044,7 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.7_2 pkg v. 0.9.11</version>
+		<version>0.9.11</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>michele@nt2.it</maintainer>
@@ -990,6 +1052,9 @@
 		<depends_on_package_pbi>lcdproc-0.5.7_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc.xml</config_file>
 		<configurationfile>lcdproc.xml</configurationfile>
+		<port_category>sysutils</port_category>
+		<run_depends>bin/lcdproc:sysutils/lcdproc</run_depends>
+		<conflicts>LCDproc</conflicts>
 		<build_pbi>
 			<port>sysutils/lcdproc</port>
 		</build_pbi>
@@ -1051,6 +1116,7 @@
 		<build_options>squidGuard-devel_UNSET_FORCE=SQUID32 SQUID33;squidGuard-devel_SET_FORCE=LDAP STRIPNT SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET_FORCE=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>OpenVPN Client Export Utility</name>
@@ -1151,7 +1217,7 @@
 		<category>Services</category>
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/shellcmd/shellcmd.xml</config_file>
-		<version>0.5</version>
+		<version>0.6</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
